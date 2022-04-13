@@ -58,10 +58,10 @@ html {
 }
 
 #all-encompasser {
-    border-style: solid;
-    border-top-width: var(--border-xl);
-    border-bottom-width: var(--border-lg);
-    border-image: var(--rainbow) 100% 1;
+  border-style: solid;
+  border-top-width: var(--border-xl);
+  border-bottom-width: var(--border-lg);
+  border-image: var(--rainbow) 100% 1;
 }
 
 body {
