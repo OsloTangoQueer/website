@@ -91,6 +91,10 @@
   background-color: var(--violet);
 }
 
+.card-text {
+  padding: 0 1em;
+}
+
 @media screen and (max-width: 50rem) {
   #hero {
     grid-template-columns: 1fr;
