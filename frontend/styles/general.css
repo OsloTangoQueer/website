@@ -66,9 +66,11 @@ html {
 
 body {
   height: 100%;
+  font-family: Roboto, sans-serif;
 }
 
 h1 {
+  font-family: Georgia, serif;
   font-size: var(--font-lg);
   margin: var(--gap-md) 0;
 }
