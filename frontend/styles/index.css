@@ -95,6 +95,26 @@
   padding: 0 1em;
 }
 
+.news {
+  /* text-align: center; */
+  max-width: var(--content-width-prose);
+  margin: auto;
+  padding: 1rem 0;
+}
+
+.news-title {
+  margin: 1rem;
+}
+
+.rainbow-break {
+  background-image: var(--rainbow);
+  min-height: var(--border-lg);
+}
+
+.news-text {
+  margin: 1em;
+}
+
 @media screen and (max-width: 50rem) {
   #hero {
     grid-template-columns: 1fr;

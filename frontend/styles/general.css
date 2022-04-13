@@ -38,7 +38,9 @@
   --transparency-md: 0.5;
   --transparency-xs: 0.9;
   --content-width-xl: 70rem;
+  --content-width-prose: 40rem;
   --font-lg: 2rem;
+  --font-xl: 3rem;
   --gap-xs: 0.25rem;
   --gap-sm: 0.75rem;
   --gap-md: 1rem;
@@ -70,7 +72,17 @@ body {
   line-height: 1.25;
 }
 
+strong {
+  font-weight: bold;
+}
+
 h1 {
+  font-family: Georgia, serif;
+  font-size: var(--font-lg);
+  margin: var(--gap-md) 0;
+}
+
+h2 {
   font-family: Georgia, serif;
   font-size: var(--font-lg);
   margin: var(--gap-md) 0;
