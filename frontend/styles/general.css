@@ -57,6 +57,7 @@ html {
   min-height: 100vh;
   background-color: var(--white);
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
 #all-encompasser {
