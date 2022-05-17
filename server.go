@@ -22,7 +22,7 @@ func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// TODO log
 		fmt.Println("err:", err)
-		w.Write([]byte("Failed to parse your email form :("))
+		w.Write([]byte("Failed to parse your email form :( contact styret@oslotangoqueer.no for help"))
 		return
 	}
 
@@ -31,7 +31,7 @@ func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// TODO log
 		fmt.Println("err:", err)
-		w.Write([]byte("invalid email address :("))
+		w.Write([]byte("invalid email address :( contact styret@oslotangoqueer.no for help"))
 		return
 	}
 
@@ -42,11 +42,11 @@ func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// TODO log
 		fmt.Println("err:", err)
-		w.Write([]byte("failed to insert email into DB :("))
+		w.Write([]byte("failed to insert email into DB :( contact styret@oslotangoqueer.no for help"))
 		return
 	}
 	// LOG success??
-	w.Write([]byte("success! :)"))
+	w.Write([]byte("success! :) welcome to the mailing list"))
 }
 
 func main() {
