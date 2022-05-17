@@ -17,19 +17,6 @@ type server struct {
 	db     *sql.DB
 }
 
-func (server *server) restartSchema(w http.ResponseWriter, r *http.Request) {
-	_, err := server.db.Exec(
-		`
-    DROP TABLE IF EXISTS newsletter;
-    CREATE TABLE newsletter
-    (
-        email   text
-    );
-    `,
-	) //TODO: unique on emails?
-	fmt.Println(err) //TODO: replace with logging
-}
-
 func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
