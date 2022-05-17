@@ -49,6 +49,30 @@ func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("success! :) welcome to the mailing list"))
 }
 
+func (server *server) unsubscribe(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// TODO log
+		fmt.Println("err:", err)
+		w.Write([]byte("Failed to parse your email form :( contact styret@oslotangoqueer.no for help"))
+		return
+	}
+	addr := r.Form.Get("Email Address")
+
+	_, err = server.db.Exec(
+		`DELETE FROM newsletter WHERE email=$1`,
+		addr,
+	)
+	if err != nil {
+		// TODO log
+		fmt.Println("err:", err)
+		w.Write([]byte("failed to delete email from DB :( contact styret@oslotangoqueer.no for help"))
+		return
+	}
+	// LOG success??
+	w.Write([]byte("success! :) you're no longer on the mailing list"))
+}
+
 func main() {
 	var server server
 
@@ -65,6 +89,7 @@ func main() {
 	defer server.db.Close()
 
 	server.router.Post("/subscribe", server.subscribe)
+	server.router.Post("/unsubscribe", server.unsubscribe)
 
 	fs := http.FileServer(http.Dir("frontend"))
 	server.router.Handle("/*", fs)
