@@ -107,7 +107,25 @@
             <div class="card">
               <div class="card-title">Abonner til mailing-listen!</div>
               <div class="card-text">
-                Well, we need to actually have a mailing list first...
+                Hold deg oppdatert med alt som skjer:
+                <form action="subscribe" method="post">
+                  <label>
+                    <input
+                      name="Email Address"
+                      autocomplete="email"
+                      placeholder="your@email.here"
+                    />
+                  </label>
+                  <br />
+                  <button type="submit" method="post">Subscribe</button>
+                  <button
+                    type="submit"
+                    method="delete"
+                    formaction="unsubscribe"
+                  >
+                    Unsubscribe
+                  </button>
+                </form>
               </div>
             </div>
             <div class="card">
