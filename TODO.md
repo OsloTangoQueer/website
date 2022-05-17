@@ -1,5 +1,6 @@
 - [ ] Testing
 - [ ] Logging
 - [ ] Systemd integration
-- [ ] Frontend
+- [ ] Calendar system
+- [x] Make a frontend
 - [x] Migrate to SQLite
