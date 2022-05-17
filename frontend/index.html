@@ -43,48 +43,161 @@
     <div id="all-encompasser">
       <div id="content-container">
         <a tabindex="1" href="#main" id="skip-link">Skip to content</a>
-        <nav id="top-nav">
-          <label id="top-nav-label" for="top-nav-toggle">
-            <span id="top-nav-label-txt">Open/Close navbar menu</span>
-            <div id="top-nav-btn"></div>
-          </label>
-          <input type="checkbox" id="top-nav-toggle" />
-          <ul class="top-nav-list">
-            <li class="top-nav-listitem" aria-hidden="true"></li>
-            <li class="top-nav-listitem" aria-hidden="true"></li>
-            <li class="top-nav-listitem active">
-              <a class="top-nav-listitem-link">Home</a>
-            </li>
-            <li class="top-nav-listitem">
-              <a class="top-nav-listitem-link">Test</a>
-            </li>
-            <li class="top-nav-listitem">
-              <a class="top-nav-listitem-link">Test</a>
-            </li>
-            <li class="top-nav-listitem">
-              <a class="top-nav-listitem-link">Test</a>
-            </li>
-          </ul>
-        </nav>
         <main id="main">
           <section id="hero">
             <div id="hero-left">
-              <h1 class="hero-title">Lorem, ipsum dolor.</h1>
-              <p class="hero-text">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia
-                reiciendis quo enim quaerat consectetur atque.
-              </p>
-              <button class="hero-btn">Lorem</button>
+              <div id="hero-left-content">
+                <h1 class="hero-title">Oslo Tango Queer.</h1>
+                <p class="hero-text">
+                  Et trygt sted for normbrytende dans, og skeive uttrykk.
+                </p>
+                <a href="#events">
+                  <button class="hero-btn">Kom dans med oss</button>
+                </a>
+              </div>
             </div>
             <div id="hero-right">
               <img
-                src="https://via.placeholder.com/450"
+                src="resources/queertango-cropped.png"
                 alt="Placeholder"
                 id="hero-img"
               />
             </div>
           </section>
-          <section class="links"></section>
+          <section class="cards">
+            <div class="card">
+              <div class="card-title">Kontakt oss!</div>
+              <div class="card-text">
+                Send oss en e-post på:<br />
+                <a href="mailto:styret@oslotangoqueer.no">
+                  styret@oslotangoqueer.no
+                </a>
+                <br />
+                ellers om du har Facebook:<br />
+                <a href="https://www.facebook.com/groups/114313728587290/">
+                  bli med i Facebook-gruppen
+                </a>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Finn oss!</div>
+              <div class="card-text">
+                Vi pleier a holde workshops på tirsdager, hos Kampen
+                Bydelshus:<br />
+                Bøgata 21 0654 Oslo
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Bli medlem!</div>
+              <div class="card-text">
+                Du kan bli medlem ved å vippse 300kr til
+                <a href="tel:+4792619953">926 12 953</a>. Medlemskap gir deg
+                stemmerett på årsmøtet vårt, og rabatt på våre workshops og
+                practicas
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Priser!</div>
+              <div class="card-text">
+                Medlemspris i parentes<br />
+                Workshops (inkl practica): 200(170)kr<br />
+                Practicas: 80(60)kr
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Abonner til mailing-listen!</div>
+              <div class="card-text">
+                Hold deg oppdatert med alt som skjer:
+                <form action="subscribe" method="post">
+                  <label>
+                    <input
+                      name="Email Address"
+                      autocomplete="email"
+                      placeholder="your@email.here"
+                    />
+                  </label>
+                  <br />
+                  <button type="submit" method="post">Subscribe</button>
+                  <button
+                    type="submit"
+                    method="delete"
+                    formaction="unsubscribe"
+                  >
+                    Unsubscribe
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Festival!</div>
+              <div class="card-text">
+                Vi holder ikke en full festival i år, men vil ha noe milongas
+                19-21 august. Hold på datoene, detaljer følger snart
+              </div>
+            </div>
+          </section>
+          <section id="events" class="news">
+            <h2 class="news-title">Nyheter</h2>
+            <div class="rainbow-break"></div>
+            <div class="news-text">
+              <strong>
+                7. Juni kl. 17.00 - Årsmøte & 12-års-jubileum-sommerfest
+              </strong>
+              <br />
+              Sted: Clarion Collection Gabelshus, Gabels gate 16, 0272 Oslo.
+              <br />
+              OTQ dekker middag og kake – alle betaler for sin egen drikke
+              Vennligst send en e-post til
+              <a href="mailto:styret@oslotangoqueer.no">
+                styret@oslotangoqueer.no
+              </a>
+              for å melde deg på årsmøte, og gi beskjed om allergier eller
+              kostholdsbehov. Du må være medlem for å delta på møtet. Om du har
+              ikke betalt medlemskontigent ennå, så kan du vippse NOK 300 til
+              926 19 953.
+            </div>
+            <div class="news-text">
+              <strong>
+                Program for våren 2022
+              </strong>
+              <br />
+              <br />
+              Kurskveldene foregår på Kampen bydelshus kl. 19.00 - 20.30, med
+              practica etterpå.
+              <br />
+              <br />
+
+              Tirsdag 15 Februar
+              <br />
+              Instruktør: Unni Hermansen
+              <br />
+              Tema: Grunntekniske elementer
+              <br />
+              <br />
+
+              Tirsdag 15 Mars
+              <br />
+              Instruktør: Unni Hermansen
+              <br />
+              Tema: Grunntekniske elementer
+              <br />
+              <br />
+
+              Tirsdag 5 April
+              <br />
+              Instruktør: Unni Hermansen
+              <br />
+              Tema: Grunntekniske elementer
+              <br />
+              <br />
+
+              Tirsdag 3 Mai
+              <br />
+              Instruktør: Unni Hermansen
+              <br />
+              Tema: Grunntekniske elementer
+            </div>
+          </section>
         </main>
         <footer></footer>
       </div>

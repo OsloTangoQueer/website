@@ -4,15 +4,128 @@
 #hero {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  min-height: 95vh;
 }
 
 #hero-right {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#hero-left-content {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  padding: 2em;
+}
+
+.hero-btn {
+  margin-top: 1em;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2em;
+  margin: 2em;
+}
+
+.card {
+  text-align: center;
+  border-radius: 1em;
+  padding-bottom: 0.5em;
+}
+
+.card:nth-of-type(1) {
+  border-top-color: var(--red);
+  background-color: rgba(var(--red-v), var(--transparency-xl));
+}
+.card:nth-of-type(2) {
+  border-top-color: var(--orange);
+  background-color: rgba(var(--orange-v), var(--transparency-xl));
+}
+.card:nth-of-type(3) {
+  border-top-color: var(--yellow);
+  background-color: rgba(var(--yellow-v), var(--transparency-xl));
+}
+.card:nth-of-type(4) {
+  border-top-color: var(--green);
+  background-color: rgba(var(--green-v), var(--transparency-xl));
+}
+.card:nth-of-type(5) {
+  border-top-color: var(--blue);
+  background-color: rgba(var(--blue-v), var(--transparency-xl));
+}
+.card:nth-of-type(6) {
+  border-top-color: var(--violet);
+  background-color: rgba(var(--violet-v), var(--transparency-xl));
+}
+
+.card-title {
+  color: var(--white);
+  font-weight: bold;
+  border-radius: 0.5em;
+  margin: 0.5em;
+  padding: 0.5em;
+}
+
+.card:nth-of-type(1) .card-title {
+  background-color: var(--red);
+}
+.card:nth-of-type(2) .card-title {
+  background-color: var(--orange);
+}
+.card:nth-of-type(3) .card-title {
+  background-color: var(--yellow);
+}
+.card:nth-of-type(4) .card-title {
+  background-color: var(--green);
+}
+.card:nth-of-type(5) .card-title {
+  background-color: var(--blue);
+}
+.card:nth-of-type(6) .card-title {
+  background-color: var(--violet);
+}
+
+.card-text {
+  padding: 0 1em;
+}
+
+form input {
+  margin: 0.5em;
+}
+
+.news {
+  /* text-align: center; */
+  max-width: var(--content-width-prose);
+  margin: auto;
+  padding: 1rem 0;
+}
+
+.news-title {
+  margin: 1rem;
+}
+
+.rainbow-break {
+  background-image: var(--rainbow);
+  min-height: var(--border-lg);
+}
+
+.news-text {
+  margin: 1em;
 }
 
 @media screen and (max-width: 50rem) {
   #hero {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
   }
 }
