@@ -69,7 +69,7 @@ func main() {
 	server.router.Use(middleware.Logger)
 
 	var err error
-	//FIXME: db connection not concurrency-safe
+	//FIXME: db connection not concurrency-safe?
 	server.db, err = sql.Open("sqlite3", "./otq.db")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open database: %v\n", err)
@@ -77,7 +77,6 @@ func main() {
 	}
 	defer server.db.Close()
 
-	server.router.Patch("/restartSchema", server.restartSchema) // TODO: remove before going live
 	server.router.Post("/subscribe", server.subscribe)
 
 	fs := http.FileServer(http.Dir("frontend"))
