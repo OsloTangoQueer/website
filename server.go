@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/mail"
 	"os"
 
 	"github.com/go-chi/chi/v5"
@@ -17,25 +17,13 @@ type server struct {
 	db     *sql.DB
 }
 
-type subscriber struct {
-	Email string
-	Name  string
-}
-
 func (server *server) restartSchema(w http.ResponseWriter, r *http.Request) {
 	_, err := server.db.Exec(
 		`
     DROP TABLE IF EXISTS newsletter;
     CREATE TABLE newsletter
     (
-        email   text,
-        name    text
-    );
-    DROP TABLE IF EXISTS festival;
-    CREATE TABLE festival
-    (
-        email   text,
-        name    text
+        email   text
     );
     `,
 	) //TODO: unique on emails?
@@ -43,21 +31,35 @@ func (server *server) restartSchema(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *server) subscribe(w http.ResponseWriter, r *http.Request) {
-	dec := json.NewDecoder(r.Body)
-	var sub subscriber
-
-	err := dec.Decode(&sub) //TODO: sanitise input?
+	err := r.ParseForm()
 	if err != nil {
-		fmt.Printf("Error decoding json: %v\n", err)
-		//TODO: log
-		return //TODO: return error message?
+		// TODO log
+		fmt.Println("err:", err)
+		w.Write([]byte("Failed to parse your email form :("))
+		return
+	}
+
+	addr := r.Form.Get("Email Address")
+	_, err = mail.ParseAddress(addr)
+	if err != nil {
+		// TODO log
+		fmt.Println("err:", err)
+		w.Write([]byte("invalid email address :("))
+		return
 	}
 
 	_, err = server.db.Exec(
-		`INSERT INTO newsletter(email, name) VALUES ($1, $2)`,
-		sub.Email, sub.Name,
+		`INSERT INTO newsletter(email) VALUES ($1)`,
+		addr,
 	)
-	fmt.Println(err) //TODO: replace with logging
+	if err != nil {
+		// TODO log
+		fmt.Println("err:", err)
+		w.Write([]byte("failed to insert email into DB :("))
+		return
+	}
+	// LOG success??
+	w.Write([]byte("success! :)"))
 }
 
 func main() {
