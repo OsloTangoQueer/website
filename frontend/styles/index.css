@@ -99,6 +99,38 @@ form input {
   margin: 0.5em;
 }
 
+.event-day {
+  margin: 1em;
+  font-size: var(--font-ml);
+}
+
+.event {
+  font-size: 1rem;
+  margin: 0.5em 0;
+}
+
+.event-header {
+  display: grid;
+  grid-template-columns: 1fr 3em;
+}
+
+.event-title {
+  font-weight: bold;
+}
+
+.event-start {
+  text-align: right;
+}
+
+.event-loc {
+  color: gray;
+}
+
+.event-end {
+  text-align: right;
+  color: gray;
+}
+
 .news {
   /* text-align: center; */
   max-width: var(--content-width-prose);
