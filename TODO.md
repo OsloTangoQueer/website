@@ -2,5 +2,6 @@
 - [ ] Logging
 - [ ] Systemd integration
 - [ ] Calendar system
+- [ ] Automate DB backups
 - [x] Make a frontend
 - [x] Migrate to SQLite
