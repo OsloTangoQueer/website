@@ -144,6 +144,9 @@ form input {
 
 .event-title {
   font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .event-start {
@@ -152,6 +155,9 @@ form input {
 
 .event-loc {
   color: gray;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .event-end {
