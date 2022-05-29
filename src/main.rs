@@ -68,6 +68,19 @@ async fn subscribe(
     Ok("ok".to_string())
 }
 
+async fn unsubscribe(
+    Form(subscriber): Form<Subscriber>,
+    DbConn(conn): DbConn,
+) -> Result<String, (StatusCode, String)> {
+    conn.execute(
+        "DELETE FROM newsletter WHERE email=?1",
+        params![subscriber.email],
+    )
+    .map_err(internal_error)?;
+
+    Ok("ok".to_string())
+}
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::registry()
@@ -90,6 +103,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/subscribe", post(subscribe))
+        .route("/unsubscribe", post(unsubscribe))
         .fallback(get_service(ServeDir::new("./frontend")).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
         .layer(Extension(db_pool));
