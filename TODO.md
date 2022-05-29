@@ -2,7 +2,7 @@
 - [ ] Systemd integration
 - [ ] Calendar system
 - [ ] Automate DB backups
-- [ ] Nicer error messages
+- [x] Nicer error messages
 - [x] Migrate backend to Rust
 - [x] ~~Logging~~ Tracing
 - [x] Make a frontend

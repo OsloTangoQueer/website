@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error 500 | Oslo Tango Queer</title>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./styles/reset.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/general.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/error.css" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./resources/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./resources/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./resources/favicon/favicon-16x16.png"
+    />
+  </head>
+
+  <body>
+    <h1 class="error-code">Error 500</h1>
+    <h2 class="error-name">Internal Server Error</h2>
+    <%= message %>
+    <img
+      src="resources/rustacean-flat-noshadow.svg"
+      class="ferris"
+      alt="Ferris"
+    />
+    <div>
+      Kontakt
+      <a href="mailto:styret@oslotangoqueer.no">styret@oslotangoqueer.no</a> for
+      hjelp.
+      <br />
+      <br />
+      <a href="/">Tilbake til hjemmesiden</a>
+    </div>
+  </body>
+</html>

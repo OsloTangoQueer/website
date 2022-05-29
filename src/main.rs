@@ -2,13 +2,14 @@ use axum::{
     async_trait,
     extract::{Extension, Form, FromRequest, RequestParts},
     http::StatusCode,
-    response::IntoResponse,
+    response::{Html, IntoResponse},
     routing::{get_service, post},
     Router,
 };
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::params;
+use sailfish::TemplateOnce;
 use serde::Deserialize;
 use std::{io, net::SocketAddr};
 use tower_http::{services::ServeDir, trace::TraceLayer};
@@ -16,15 +17,39 @@ use tracing::debug;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use validator::Validate;
 
-async fn handle_error(_err: io::Error) -> impl IntoResponse {
-    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
+#[derive(TemplateOnce)]
+#[template(path = "500.stpl")]
+struct Error500Template {
+    message: String,
 }
 
-fn internal_error<E>(err: E) -> (StatusCode, String)
+async fn handle_error(_err: io::Error) -> impl IntoResponse {
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Html(
+            Error500Template {
+                message: "Something went wrong...".to_string(),
+            }
+            .render_once()
+            .unwrap_or("Uh oh... Something went really wrong".to_string()),
+        ),
+    )
+}
+
+fn internal_error<E>(err: E) -> (StatusCode, Html<String>)
 where
     E: std::error::Error,
 {
-    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Html(
+            Error500Template {
+                message: err.to_string(),
+            }
+            .render_once()
+            .unwrap_or("Uh oh... Something went really wrong".to_string()),
+        ),
+    )
 }
 
 struct DbConn(r2d2::PooledConnection<SqliteConnectionManager>);
@@ -34,7 +59,7 @@ impl<B> FromRequest<B> for DbConn
 where
     B: Send,
 {
-    type Rejection = (StatusCode, String);
+    type Rejection = (StatusCode, Html<String>);
 
     async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
         let Extension(pool) = Extension::<Pool<SqliteConnectionManager>>::from_request(req)
@@ -56,7 +81,7 @@ struct Subscriber {
 async fn subscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
-) -> Result<String, (StatusCode, String)> {
+) -> Result<String, (StatusCode, Html<String>)> {
     subscriber.validate().map_err(internal_error)?;
 
     conn.execute(
@@ -71,7 +96,7 @@ async fn subscribe(
 async fn unsubscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
-) -> Result<String, (StatusCode, String)> {
+) -> Result<String, (StatusCode, Html<String>)> {
     conn.execute(
         "DELETE FROM newsletter WHERE email=?1",
         params![subscriber.email],

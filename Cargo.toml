@@ -16,3 +16,4 @@ r2d2 = "0.8.9"
 r2d2_sqlite = "0.20.0"
 serde = { version = "1.0", features = ["derive"] }
 validator = { version = "0.15", features = ["derive"] }
+sailfish = "0.4.0"
