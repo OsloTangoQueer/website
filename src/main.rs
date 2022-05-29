@@ -18,17 +18,23 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use validator::Validate;
 
 #[derive(TemplateOnce)]
-#[template(path = "500.stpl")]
-struct Error500Template {
+#[template(path = "response.stpl")]
+struct ResponseTemplate {
+    code: String,
+    title: String,
     message: String,
+    image_link: String,
 }
 
-async fn handle_error(_err: io::Error) -> impl IntoResponse {
+async fn handle_error(err: io::Error) -> impl IntoResponse {
     (
         StatusCode::INTERNAL_SERVER_ERROR,
         Html(
-            Error500Template {
-                message: "Something went wrong...".to_string(),
+            ResponseTemplate {
+                code: "Error 500".to_string(),
+                title: "Internal Server Error".to_string(),
+                message: err.to_string(),
+                image_link: "resources/rustacean-flat-noshadow.svg".to_string(),
             }
             .render_once()
             .unwrap_or("Uh oh... Something went really wrong".to_string()),
@@ -43,8 +49,27 @@ where
     (
         StatusCode::INTERNAL_SERVER_ERROR,
         Html(
-            Error500Template {
+            ResponseTemplate {
+                code: "Error 500".to_string(),
+                title: "Internal Server Error".to_string(),
                 message: err.to_string(),
+                image_link: "resources/rustacean-flat-noshadow.svg".to_string(),
+            }
+            .render_once()
+            .unwrap_or("Uh oh... Something went really wrong".to_string()),
+        ),
+    )
+}
+
+fn success_response(message: &str) -> (StatusCode, Html<String>) {
+    (
+        StatusCode::OK,
+        Html(
+            ResponseTemplate {
+                code: "Ok 200".to_string(),
+                title: "Success!".to_string(),
+                message: message.to_string(),
+                image_link: "resources/rustacean-flat-happy.svg".to_string(),
             }
             .render_once()
             .unwrap_or("Uh oh... Something went really wrong".to_string()),
@@ -81,7 +106,7 @@ struct Subscriber {
 async fn subscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
-) -> Result<String, (StatusCode, Html<String>)> {
+) -> Result<(StatusCode, Html<String>), (StatusCode, Html<String>)> {
     subscriber.validate().map_err(internal_error)?;
 
     conn.execute(
@@ -90,20 +115,22 @@ async fn subscribe(
     )
     .map_err(internal_error)?;
 
-    Ok("ok".to_string())
+    Ok(success_response("Velkommen til mailinglisten! :)"))
 }
 
 async fn unsubscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
-) -> Result<String, (StatusCode, Html<String>)> {
+) -> Result<(StatusCode, Html<String>), (StatusCode, Html<String>)> {
     conn.execute(
         "DELETE FROM newsletter WHERE email=?1",
         params![subscriber.email],
     )
     .map_err(internal_error)?;
 
-    Ok("ok".to_string())
+    Ok(success_response(
+        "epostadressen din er fjernet fra listen! :)",
+    ))
 }
 
 #[tokio::main]

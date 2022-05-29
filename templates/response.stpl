@@ -28,11 +28,11 @@
   </head>
 
   <body>
-    <h1 class="error-code">Error 500</h1>
-    <h2 class="error-name">Internal Server Error</h2>
+    <h1 class="error-code"><%= code %></h1>
+    <h2 class="error-name"><%= title %></h2>
     <%= message %>
     <img
-      src="resources/rustacean-flat-noshadow.svg"
+      src="<%= image_link %>"
       class="ferris"
       alt="Ferris"
     />
