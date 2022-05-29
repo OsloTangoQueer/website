@@ -1,7 +1,8 @@
-- [ ] Testing
-- [ ] Logging
+- [ ] Testing?
 - [ ] Systemd integration
 - [ ] Calendar system
 - [ ] Automate DB backups
+- [x] Migrate backend to Rust
+- [x] ~~Logging~~ Tracing
 - [x] Make a frontend
 - [x] Migrate to SQLite

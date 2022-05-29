@@ -1,5 +1,0 @@
-DROP TABLE IF EXISTS newsletter;
-CREATE TABLE newsletter
-(
-    email   text
- );
