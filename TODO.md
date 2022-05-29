@@ -1,7 +1,7 @@
 - [ ] Testing?
-- [ ] Systemd integration
 - [ ] Calendar system
 - [ ] Automate DB backups
+- [x] Systemd integration
 - [x] Nicer error messages
 - [x] Migrate backend to Rust
 - [x] ~~Logging~~ Tracing

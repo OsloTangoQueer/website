@@ -11,6 +11,7 @@ tokio = { version = "1", features = ["full"] }
 tower-http = { version = "0.3.0", features = ["fs", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-journald = "0.3.0"
 rusqlite = "0.27.0"
 r2d2 = "0.8.9"
 r2d2_sqlite = "0.20.0"

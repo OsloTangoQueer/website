@@ -1,6 +1,8 @@
 #!/bin/sh
 
 rsync -avz --delete frontend/ intarga@ingrids.space:/var/www/oslotangoqueer.no/html
-go build . && rsync -avz --delete otq-no intarga@ingrids.space:~
+cargo build --release && rsync -avz --delete target/release/otq-no intarga@ingrids.space:~/otq-no/otq-no
+rsync -avz --delete frontend/ intarga@ingrids.space:~/otq-no/frontend
+rsync -avz --delete templates/ intarga@ingrids.space:~/otq-no/templates
 
 exit 0

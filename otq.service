@@ -1,0 +1,11 @@
+[Unit]
+Description=Webserver for oslotangoqueer.no
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/intarga/otq-no/otq-no
+
+[Install]
+WantedBy=multi-user.target
