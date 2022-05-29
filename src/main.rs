@@ -83,7 +83,7 @@ async fn main() {
         .get()
         .expect("failed to get DB connection")
         .execute(
-            "CREATE TABLE IF NOT EXISTS newsletter (email text)",
+            "CREATE TABLE IF NOT EXISTS newsletter (email text UNIQUE)",
             params![],
         )
         .expect("failed to create newsletter table");
