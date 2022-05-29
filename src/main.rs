@@ -14,6 +14,7 @@ use std::{io, net::SocketAddr};
 use tower_http::{services::ServeDir, trace::TraceLayer};
 use tracing::debug;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use validator::Validate;
 
 async fn handle_error(_err: io::Error) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
@@ -46,8 +47,9 @@ where
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Validate, Deserialize)]
 struct Subscriber {
+    #[validate(email)]
     email: String,
 }
 
@@ -55,7 +57,7 @@ async fn subscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
 ) -> Result<String, (StatusCode, String)> {
-    // TODO: Validate email address
+    subscriber.validate().map_err(internal_error)?;
 
     conn.execute(
         "INSERT INTO newsletter (email) VALUES (?1)",
