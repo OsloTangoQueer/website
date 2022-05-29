@@ -1,4 +1,3 @@
-env.sh
+/target
 testscripts/*
 otq.db
-otq-no
