@@ -1,13 +1,15 @@
 use axum::{
-    extract::Extension,
+    async_trait,
+    extract::{Extension, Form, FromRequest, RequestParts},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, get_service},
+    routing::{get_service, post},
     Router,
 };
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::params;
+use serde::Deserialize;
 use std::{io, net::SocketAddr};
 use tower_http::{services::ServeDir, trace::TraceLayer};
 use tracing::debug;
@@ -15,6 +17,53 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 async fn handle_error(_err: io::Error) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
+}
+
+fn internal_error<E>(err: E) -> (StatusCode, String)
+where
+    E: std::error::Error,
+{
+    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+}
+
+struct DbConn(r2d2::PooledConnection<SqliteConnectionManager>);
+
+#[async_trait]
+impl<B> FromRequest<B> for DbConn
+where
+    B: Send,
+{
+    type Rejection = (StatusCode, String);
+
+    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        let Extension(pool) = Extension::<Pool<SqliteConnectionManager>>::from_request(req)
+            .await
+            .map_err(internal_error)?;
+
+        let conn = pool.get().map_err(internal_error)?;
+
+        Ok(Self(conn))
+    }
+}
+
+#[derive(Deserialize)]
+struct Subscriber {
+    email: String,
+}
+
+async fn subscribe(
+    Form(subscriber): Form<Subscriber>,
+    DbConn(conn): DbConn,
+) -> Result<String, (StatusCode, String)> {
+    // TODO: Validate email address
+
+    conn.execute(
+        "INSERT INTO newsletter (email) VALUES (?1)",
+        params![subscriber.email],
+    )
+    .map_err(internal_error)?;
+
+    Ok("ok".to_string())
 }
 
 #[tokio::main]
@@ -38,7 +87,7 @@ async fn main() {
         .expect("failed to create newsletter table");
 
     let app = Router::new()
-        .route("/foo", get(|| async { "Hi from /foo" }))
+        .route("/subscribe", post(subscribe))
         .fallback(get_service(ServeDir::new("./frontend")).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
         .layer(Extension(db_pool));
