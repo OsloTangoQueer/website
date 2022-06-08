@@ -17,6 +17,23 @@ use tracing::debug;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use validator::Validate;
 
+#[derive(Deserialize)]
+struct Config {
+    email_username: String,
+    email_password: String,
+    smtp_server: String,
+    smtp_port: i64,
+
+    db_path: String,
+
+    frontend_path: String,
+}
+
+fn read_config() -> std::io::Result<Config> {
+    let content = std::fs::read_to_string("/home/intarga/otq-no/Config.toml")?;
+    Ok(toml::from_str(&content)?)
+}
+
 #[derive(TemplateOnce)]
 #[template(path = "response.stpl")]
 struct ResponseTemplate {
@@ -135,6 +152,8 @@ async fn unsubscribe(
 
 #[tokio::main]
 async fn main() {
+    let config: Config = read_config().expect("Failed to read config file");
+
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(
             std::env::var("RUST_LOG").unwrap_or_else(|_| "otq_no=debug,tower_http=debug".into()),
@@ -143,7 +162,7 @@ async fn main() {
         .with(tracing_journald::layer().unwrap())
         .init();
 
-    let db_pool = Pool::new(SqliteConnectionManager::file("otq.db"))
+    let db_pool = Pool::new(SqliteConnectionManager::file(config.db_path))
         .expect("failed to create DB connection pool");
     db_pool
         .get()
@@ -157,7 +176,7 @@ async fn main() {
     let app = Router::new()
         .route("/subscribe", post(subscribe))
         .route("/unsubscribe", post(unsubscribe))
-        .fallback(get_service(ServeDir::new("./frontend")).handle_error(handle_error))
+        .fallback(get_service(ServeDir::new(config.frontend_path)).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
         .layer(Extension(db_pool));
 
