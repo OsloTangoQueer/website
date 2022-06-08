@@ -6,6 +6,10 @@ use axum::{
     routing::{get_service, post},
     Router,
 };
+use lettre::{
+    message::Mailbox, transport::smtp::authentication::Credentials, Message, SmtpTransport,
+    Transport,
+};
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::params;
@@ -13,7 +17,7 @@ use sailfish::TemplateOnce;
 use serde::Deserialize;
 use std::{io, net::SocketAddr};
 use tower_http::{services::ServeDir, trace::TraceLayer};
-use tracing::debug;
+use tracing::{debug, error, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use validator::Validate;
 
@@ -94,6 +98,35 @@ fn success_response(message: &str) -> (StatusCode, Html<String>) {
     )
 }
 
+fn send_subscribe_email(addr: Mailbox) {
+    let config: Config = read_config().expect("Failed to read config file");
+
+    let email = Message::builder()
+        .from(
+            "Oslo Tango Queer <styret@oslotangoqueer.no>"
+                .parse()
+                .unwrap(),
+        )
+        .to(addr)
+        .bcc("styret@oslotangoqueer.no".parse().unwrap())
+        .subject("Welcome to the mailing list!")
+        .body(String::from(""))
+        .unwrap();
+
+    let creds = Credentials::new(config.email_username, config.email_password);
+
+    let mailer = SmtpTransport::relay(&config.smtp_server)
+        .unwrap()
+        .port(config.smtp_port.try_into().unwrap())
+        .credentials(creds)
+        .build();
+
+    match mailer.send(&email) {
+        Ok(_) => println!("Email sent successfully!"),
+        Err(e) => println!("Could not send email: {:?}", e),
+    }
+}
+
 struct DbConn(r2d2::PooledConnection<SqliteConnectionManager>);
 
 #[async_trait]
@@ -124,6 +157,7 @@ async fn subscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
 ) -> Result<(StatusCode, Html<String>), (StatusCode, Html<String>)> {
+    info!("Subscribe request from {}", subscriber.email);
     subscriber.validate().map_err(internal_error)?;
 
     conn.execute(
@@ -131,6 +165,11 @@ async fn subscribe(
         params![subscriber.email],
     )
     .map_err(internal_error)?;
+
+    match subscriber.email.parse::<Mailbox>() {
+        Ok(addr) => send_subscribe_email(addr),
+        Err(err) => error!("Failed to send subscribe confirmation: {}", err),
+    }
 
     Ok(success_response("Velkommen til mailinglisten! :)"))
 }
