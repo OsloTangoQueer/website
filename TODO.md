@@ -1,6 +1,13 @@
 - [ ] Testing?
+- [ ] Replace emoji with svg icons?
+- [ ] Use of gradients for card backgrounds?
 - [ ] Calendar system
 - [ ] Automate DB backups
+- [ ] Email notifications for subscriptions
+    - [x] Basic implementation
+    - [ ] Body content
+    - [ ] Unsubscribe link in email
+    - [ ] Client pooling
 - [x] Systemd integration
 - [x] Nicer error messages
 - [x] Migrate backend to Rust
