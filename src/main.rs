@@ -98,8 +98,8 @@ fn success_response(message: &str) -> (StatusCode, Html<String>) {
     )
 }
 
-fn send_subscribe_email(addr: Mailbox) {
-    let config: Config = read_config().expect("Failed to read config file");
+fn send_subscribe_email(addr: Mailbox) -> Result<(), (StatusCode, Html<String>)> {
+    let config: Config = read_config().map_err(internal_error)?;
 
     let email = Message::builder()
         .from(
@@ -108,23 +108,22 @@ fn send_subscribe_email(addr: Mailbox) {
                 .unwrap(),
         )
         .to(addr)
-        .bcc("styret@oslotangoqueer.no".parse().unwrap())
+        .bcc("styret@oslotangoqueer.no".parse().map_err(internal_error)?)
         .subject("Velkommen til e-postlisten!")
         .body(String::from(""))
-        .unwrap();
+        .map_err(internal_error)?;
 
     let creds = Credentials::new(config.email_username, config.email_password);
 
     let mailer = SmtpTransport::relay(&config.smtp_server)
-        .unwrap()
+        .map_err(internal_error)?
         .port(config.smtp_port.try_into().unwrap())
         .credentials(creds)
         .build();
 
-    match mailer.send(&email) {
-        Ok(_) => println!("Email sent successfully!"),
-        Err(e) => println!("Could not send email: {:?}", e),
-    }
+    mailer.send(&email).map_err(internal_error)?;
+
+    Ok(())
 }
 
 struct DbConn(r2d2::PooledConnection<SqliteConnectionManager>);
@@ -167,7 +166,7 @@ async fn subscribe(
     .map_err(internal_error)?;
 
     match subscriber.email.parse::<Mailbox>() {
-        Ok(addr) => send_subscribe_email(addr),
+        Ok(addr) => send_subscribe_email(addr)?,
         Err(err) => error!("Failed to send subscribe confirmation: {}", err),
     }
 
