@@ -35,6 +35,7 @@ struct Config {
 
 fn read_config() -> std::io::Result<Config> {
     let content = std::fs::read_to_string("/home/intarga/otq-no/Config.toml")?;
+    // let content = std::fs::read_to_string("/Users/intarga/.config/otq-no/Config.toml")?;
     Ok(toml::from_str(&content)?)
 }
 
