@@ -109,7 +109,7 @@ fn send_subscribe_email(addr: Mailbox) {
         )
         .to(addr)
         .bcc("styret@oslotangoqueer.no".parse().unwrap())
-        .subject("Welcome to the mailing list!")
+        .subject("Velkommen til e-postlisten!")
         .body(String::from(""))
         .unwrap();
 
@@ -171,7 +171,7 @@ async fn subscribe(
         Err(err) => error!("Failed to send subscribe confirmation: {}", err),
     }
 
-    Ok(success_response("Velkommen til mailinglisten! :)"))
+    Ok(success_response("Velkommen til e-postlisten! :)"))
 }
 
 async fn unsubscribe(
