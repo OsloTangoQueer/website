@@ -1,6 +1,6 @@
 use axum::{
     async_trait,
-    extract::{Extension, Form, FromRequest, RequestParts},
+    extract::{Extension, Form, FromRequest, Query, RequestParts},
     http::StatusCode,
     response::{Html, IntoResponse},
     routing::{get_service, post},
@@ -12,6 +12,7 @@ use lettre::{
 };
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
+use rand::prelude::*;
 use rusqlite::params;
 use sailfish::TemplateOnce;
 use serde::Deserialize;
@@ -99,6 +100,33 @@ fn success_response(message: &str) -> (StatusCode, Html<String>) {
     )
 }
 
+fn send_confirmation_email(addr: Mailbox, code: u64) -> Result<(), (StatusCode, Html<String>)> {
+    let config: Config = read_config().map_err(internal_error)?;
+
+    let email = Message::builder()
+        .from(
+            "Oslo Tango Queer <styret@oslotangoqueer.no>"
+                .parse()
+                .unwrap(),
+        )
+        .to(addr)
+        .subject("Confirm your subscription")
+        .body(String::from("")) //TODO put confirmation link here
+        .map_err(internal_error)?;
+
+    let creds = Credentials::new(config.email_username, config.email_password);
+
+    let mailer = SmtpTransport::relay(&config.smtp_server)
+        .map_err(internal_error)?
+        .port(config.smtp_port.try_into().unwrap())
+        .credentials(creds)
+        .build();
+
+    mailer.send(&email).map_err(internal_error)?;
+
+    Ok(())
+}
+
 fn send_subscribe_email(addr: Mailbox) -> Result<(), (StatusCode, Html<String>)> {
     let config: Config = read_config().map_err(internal_error)?;
 
@@ -153,6 +181,11 @@ struct Subscriber {
     email: String,
 }
 
+#[derive(Deserialize)]
+struct ConfirmationCode {
+    code: u64,
+}
+
 async fn subscribe(
     Form(subscriber): Form<Subscriber>,
     DbConn(conn): DbConn,
@@ -160,18 +193,41 @@ async fn subscribe(
     info!("Subscribe request from {}", subscriber.email);
     subscriber.validate().map_err(internal_error)?;
 
+    let code: u64 = random();
+
     conn.execute(
-        "INSERT INTO newsletter (email) VALUES (?1)",
-        params![subscriber.email],
+        "INSERT INTO newsletter_confirmations (email, code) VALUES (?1, ?2)",
+        params![subscriber.email, code],
     )
     .map_err(internal_error)?;
 
     match subscriber.email.parse::<Mailbox>() {
-        Ok(addr) => send_subscribe_email(addr)?,
+        Ok(addr) => send_confirmation_email(addr, code)?,
         Err(err) => error!("Failed to send subscribe confirmation: {}", err),
     }
 
-    Ok(success_response("Velkommen til e-postlisten! :)"))
+    Ok(success_response("Velkommen til e-postlisten! :)")) //TODO change this
+}
+
+async fn confirm(
+    confirmation_code: Query<ConfirmationCode>,
+    DbConn(conn): DbConn,
+) -> Result<(StatusCode, Html<String>), (StatusCode, Html<String>)> {
+    let code = confirmation_code.0.code;
+    info!("Confirm request with code {}", code);
+
+    let email: String = conn
+        .query_row(
+            "SELECT FROM newsletter_confirmations WHERE code=?1",
+            params![code],
+            |row| row.get(0),
+        )
+        .map_err(internal_error)?;
+
+    conn.execute("INSERT INTO newsletter (email) VALUES (?1)", params![email])
+        .map_err(internal_error)?;
+
+    Ok(success_response("Velkommen til e-postlisten! :)")) //TODO put email address in here
 }
 
 async fn unsubscribe(
@@ -214,6 +270,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/subscribe", post(subscribe))
+        .route("/confirm", post(confirm))
         .route("/unsubscribe", post(unsubscribe))
         .fallback(get_service(ServeDir::new(config.frontend_path)).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
