@@ -201,7 +201,7 @@ async fn subscribe(
 
     conn.execute(
         "INSERT INTO newsletter_confirmations (email, code) VALUES (?1, ?2)",
-        params![subscriber.email, code],
+        params![subscriber.email, code.to_string()],
     )
     .map_err(internal_error)?;
 
@@ -223,7 +223,7 @@ async fn confirm(
     let email: String = conn
         .query_row(
             "SELECT * FROM newsletter_confirmations WHERE code=?1",
-            params![code],
+            params![code.to_string()],
             |row| row.get(0),
         )
         .map_err(internal_error)?;
