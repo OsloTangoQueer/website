@@ -210,7 +210,9 @@ async fn subscribe(
         Err(err) => error!("Failed to send subscribe confirmation: {}", err),
     }
 
-    Ok(success_response("Confirmation email sent! Check your email account, and contact styret@oslotangoqueer.no if you have any problems.".to_string()))
+    Ok(success_response(
+        "Confirmation email sent! Check your email account to complete the process".to_string(),
+    ))
 }
 
 async fn confirm(
@@ -252,9 +254,10 @@ async fn unsubscribe(
     )
     .map_err(internal_error)?;
 
-    Ok(success_response(
-        "epostadressen din er fjernet fra listen! :)".to_string(),
-    ))
+    Ok(success_response(format!(
+        "{} has been removed from the mailing-list!",
+        subscriber.email,
+    )))
 }
 
 #[tokio::main]
