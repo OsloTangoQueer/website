@@ -113,8 +113,8 @@ fn send_confirmation_email(addr: Mailbox, code: u64) -> Result<(), (StatusCode, 
         .to(addr)
         .subject("Confirm your subscription")
         .multipart(MultiPart::alternative_plain_html(
-            format!("localhost:8080/confirm?{}", code),
-            format!("<p>Follow the link below to confirm your subscription to Oslo Tango Queer's mailing-list:<br /><a href=\"localhost:8080/confirm?code={code}\">oslotangoqueer.no/confirm?code={code}</a></p>"),
+            format!("Visit the address below to confirm your subscription to Oslo Tango Queer's mailing-list:\n\noslotangoqueer.no/confirm?code={code}"),
+            format!("<p>Follow the link below to confirm your subscription to Oslo Tango Queer's mailing-list:<br /><br /><a href=\"https://oslotangoqueer.no/confirm?code={code}\">oslotangoqueer.no/confirm?code={code}</a></p>"),
         ))
         .map_err(internal_error)?;
 
