@@ -3,12 +3,13 @@ use axum::{
     extract::{Extension, Form, FromRequest, Query, RequestParts},
     http::StatusCode,
     response::{Html, IntoResponse},
-    routing::{get_service, post},
+    routing::{get, get_service, post},
     Router,
 };
 use lettre::{
-    message::Mailbox, transport::smtp::authentication::Credentials, Message, SmtpTransport,
-    Transport,
+    message::{Mailbox, MultiPart},
+    transport::smtp::authentication::Credentials,
+    Message, SmtpTransport, Transport,
 };
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -16,7 +17,7 @@ use rand::prelude::*;
 use rusqlite::params;
 use sailfish::TemplateOnce;
 use serde::Deserialize;
-use std::{io, net::SocketAddr};
+use std::{format, io, net::SocketAddr};
 use tower_http::{services::ServeDir, trace::TraceLayer};
 use tracing::{debug, error, info};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -84,7 +85,7 @@ where
     )
 }
 
-fn success_response(message: &str) -> (StatusCode, Html<String>) {
+fn success_response(message: String) -> (StatusCode, Html<String>) {
     (
         StatusCode::OK,
         Html(
@@ -111,7 +112,10 @@ fn send_confirmation_email(addr: Mailbox, code: u64) -> Result<(), (StatusCode, 
         )
         .to(addr)
         .subject("Confirm your subscription")
-        .body(String::from("")) //TODO put confirmation link here
+        .multipart(MultiPart::alternative_plain_html(
+            format!("localhost:8080/confirm?{}", code),
+            format!("<p>Follow the link below to confirm your subscription to Oslo Tango Queer's mailing-list:<br /><a href=\"localhost:8080/confirm?code={code}\">oslotangoqueer.no/confirm?code={code}</a></p>"),
+        ))
         .map_err(internal_error)?;
 
     let creds = Credentials::new(config.email_username, config.email_password);
@@ -138,7 +142,7 @@ fn send_subscribe_email(addr: Mailbox) -> Result<(), (StatusCode, Html<String>)>
         )
         .to(addr)
         .bcc("styret@oslotangoqueer.no".parse().map_err(internal_error)?)
-        .subject("Velkommen til e-postlisten!")
+        .subject("Welcome to the mailing-list!")
         .body(String::from(""))
         .map_err(internal_error)?;
 
@@ -206,7 +210,7 @@ async fn subscribe(
         Err(err) => error!("Failed to send subscribe confirmation: {}", err),
     }
 
-    Ok(success_response("Velkommen til e-postlisten! :)")) //TODO change this
+    Ok(success_response("Confirmation email sent! Check your email account, and contact styret@oslotangoqueer.no if you have any problems.".to_string()))
 }
 
 async fn confirm(
@@ -218,7 +222,7 @@ async fn confirm(
 
     let email: String = conn
         .query_row(
-            "SELECT FROM newsletter_confirmations WHERE code=?1",
+            "SELECT * FROM newsletter_confirmations WHERE code=?1",
             params![code],
             |row| row.get(0),
         )
@@ -227,7 +231,15 @@ async fn confirm(
     conn.execute("INSERT INTO newsletter (email) VALUES (?1)", params![email])
         .map_err(internal_error)?;
 
-    Ok(success_response("Velkommen til e-postlisten! :)")) //TODO put email address in here
+    match email.parse::<Mailbox>() {
+        Ok(addr) => send_subscribe_email(addr)?,
+        Err(err) => error!("Failed to send subscribe confirmation: {}", err),
+    }
+
+    Ok(success_response(format!(
+        "{} has been subscribed to the mailing-list!",
+        email
+    )))
 }
 
 async fn unsubscribe(
@@ -241,7 +253,7 @@ async fn unsubscribe(
     .map_err(internal_error)?;
 
     Ok(success_response(
-        "epostadressen din er fjernet fra listen! :)",
+        "epostadressen din er fjernet fra listen! :)".to_string(),
     ))
 }
 
@@ -270,7 +282,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/subscribe", post(subscribe))
-        .route("/confirm", post(confirm))
+        .route("/confirm", get(confirm))
         .route("/unsubscribe", post(unsubscribe))
         .fallback(get_service(ServeDir::new(config.frontend_path)).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
