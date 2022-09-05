@@ -159,6 +159,10 @@ fn send_subscribe_email(addr: Mailbox) -> Result<(), (StatusCode, Html<String>)>
     Ok(())
 }
 
+fn regenerate_calendar() -> Result<(), (StatusCode, Html<String>)> {
+    Ok(())
+}
+
 struct DbConn(r2d2::PooledConnection<SqliteConnectionManager>);
 
 #[async_trait]
@@ -260,6 +264,14 @@ async fn unsubscribe(
     )))
 }
 
+async fn regen_calendar() -> Result<(StatusCode, Html<String>), (StatusCode, Html<String>)> {
+    regenerate_calendar()?;
+
+    Ok(success_response(
+        "The calendar has been regenerated!".to_string(),
+    ))
+}
+
 #[tokio::main]
 async fn main() {
     let config: Config = read_config().expect("Failed to read config file");
@@ -287,6 +299,7 @@ async fn main() {
         .route("/subscribe", post(subscribe))
         .route("/confirm", get(confirm))
         .route("/unsubscribe", post(unsubscribe))
+        .route("/regen_calendar", get(regen_calendar))
         .fallback(get_service(ServeDir::new(config.frontend_path)).handle_error(handle_error))
         .layer(TraceLayer::new_for_http())
         .layer(Extension(db_pool));
